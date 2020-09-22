@@ -91,8 +91,7 @@ public class RegisterActivity extends AppCompatActivity {
         userPassword = (EditText) findViewById(R.id.register_password);
         alreadyHaveAccountLink = (TextView) findViewById(R.id.already_have_an_account_link);
 
-        Context context;
-        loadingBar = new ProgressDialog(RegisterActivity.this);
+        loadingBar = new ProgressDialog(this);
     }
 
     private void sendUserToLoginActivity() {
