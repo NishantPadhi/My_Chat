@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
-    private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private Button loginButton, phoneLoginButton;
     private EditText userEmail, userPassword;
@@ -35,7 +34,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
 
         InitializeFields();
 
@@ -76,13 +74,12 @@ public class LoginActivity extends AppCompatActivity {
                             if(task.isSuccessful()) {
                                 sendUserToMainActivity();
                                 Toast.makeText(LoginActivity.this, "Log in Successful...",Toast.LENGTH_SHORT);
-                                loadingBar.dismiss();
                             }
                             else {
                                 String message = task.getException().toString();
                                 Toast.makeText(LoginActivity.this, "Error : " + message, Toast.LENGTH_SHORT);
-                                loadingBar.dismiss();
                             }
+                            loadingBar.dismiss();
                         }
                     });
         }
@@ -102,15 +99,13 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        if(currentUser != null) {
-            sendUserToMainActivity();
-        }
     }
 
     private void sendUserToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        finish();
     }
 
     private void sendUserToRegisterActivity() {

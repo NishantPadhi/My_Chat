@@ -18,12 +18,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
     private Button createAccountButton;
     private EditText userEmail, userPassword;
     private TextView alreadyHaveAccountLink;
     private FirebaseAuth mAuth;
+    private DatabaseReference rootReference;
     private ProgressDialog loadingBar;
 
     @Override
@@ -32,6 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
+        rootReference = FirebaseDatabase.getInstance().getReference();
 
         InitializeFields();
 
@@ -71,15 +75,17 @@ public class RegisterActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()) {
-                                sendUserToLoginActivity();
+
+                                String currentUserId = mAuth.getCurrentUser().getUid();
+                                rootReference.child("Users").child(currentUserId).setValue("");
+                                sendUserToMainActivity();
                                 Toast.makeText(RegisterActivity.this, "Account Created Successfully...", Toast.LENGTH_SHORT);
-                                loadingBar.dismiss();
                             }
                             else {
                                 String message = task.getException().toString();
                                 Toast.makeText(RegisterActivity.this, "Error : " + message, Toast.LENGTH_SHORT);
-                                loadingBar.dismiss();
                             }
+                            loadingBar.dismiss();
                         }
                     });
         }
@@ -99,4 +105,10 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void sendUserToMainActivity() {
+        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 }
