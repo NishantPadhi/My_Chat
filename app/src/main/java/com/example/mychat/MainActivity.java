@@ -75,11 +75,17 @@ public class MainActivity extends AppCompatActivity {
             sendUserToLoginActivity();
         }
         else if(item.getItemId() == R.id.main_settings_option) {
-
+            sendUserToSettingsActivity();
         }
         else if(item.getItemId() == R.id.main_find_friends_option) {
 
         }
         return true;
     }
+
+    private void sendUserToSettingsActivity() {
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
 }
