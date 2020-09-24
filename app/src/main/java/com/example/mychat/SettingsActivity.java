@@ -15,8 +15,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -41,14 +44,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         InitializeFileds();
 
+        userName.setVisibility(View.INVISIBLE);
+
         updateAccountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 UpdateSettings();
             }
         });
+        
+        RetrieveUserInfo();
     }
-
 
     private void InitializeFileds() {
         updateAccountSettings = (Button) findViewById(R.id.update_settings_button);
@@ -94,5 +100,38 @@ public class SettingsActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void RetrieveUserInfo() {
+        rootReference.child("Users").child(currentUserId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists() && (snapshot.hasChild("name") && snapshot.hasChild("image"))) {
+                    String user_name = snapshot.child("name").getValue().toString();
+                    String user_status = snapshot.child("status").getValue().toString();
+                    String userProfilePic = snapshot.child("image").getValue().toString();
+
+                    userName.setText(user_name);
+                    userStatus.setText(user_status);
+
+                }
+                else if(snapshot.exists() && snapshot.hasChild("name")) {
+                    String user_name = snapshot.child("name").getValue().toString();
+                    String user_status = snapshot.child("status").getValue().toString();
+
+                    userName.setText(user_name);
+                    userStatus.setText(user_status);
+                }
+                else {
+                    userName.setVisibility(View.VISIBLE);
+                    Toast.makeText(SettingsActivity.this, "Please update your profile Info", Toast.LENGTH_SHORT);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
